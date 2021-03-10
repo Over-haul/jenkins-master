@@ -1,0 +1,105 @@
+controller:
+  jenkinsUrl: jankins.aws.over-haul.com
+  jenkinsAdminEmail: jankins@over-haul.com
+  JCasC:
+    enabled: true
+    # defaultConfig -> https://github.com/jenkinsci/helm-charts/blob/9b0cbbe5bb4b3f77785e92c7f44445795f8ec754/charts/jenkins/templates/_helpers.tpl#L96-L196
+    defaultConfig: true
+    configScripts:
+      00-base-config: |
+        jenkins:
+          systemMessage: |
+            Welcome to our build server.
+        
+            This Jenkins is 100% configured and managed 'as code'.
+            Config is now mostly handled by the 'Jenkins Configuration as Code' (JCasC) plugin.
+            JCasC config can be found in the /usr/share/jenkins/ref/casc_configs folder.
+        
+            Some settings are still injected from /usr/share/jenkins/ref/init.groovy.d/ scripts,
+            but these settings will be ported over to JCasC as support becomes available.
+            See https://github.com/Over-haul/jenkins-master for more
+        unclassified:
+          themeManager:
+            disableUserThemes: true
+            theme: "darkSystem" # use 'dark' for forcing the dark theme regardless of OS settings
+      01-github: |
+        credentials:
+          system:
+            domainCredentials:
+            - credentials:
+              - string:
+                  description: "Github API Key"
+                  id: "github-api-token"
+                  scope: GLOBAL
+                  secret: ${GITHUB_API_TOKEN}
+              - usernamePassword:
+                  id: "github-api-username"
+                  scope: GLOBAL
+                  username: github-user
+                  password: ${GITHUB_API_TOKEN}
+        unclassified:
+          githubpluginconfig:
+            hookUrl: {{ template "jenkins.url" . }}/github-webhook/
+            configs:
+            - apiUrl: "https://api.github.com"
+              credentialsId: "github-api-key-id"
+              name: "GitHub"
+              manageHooks: true
+          globalLibraries:
+            libraries:
+              - name: "jenkins-library"
+                defaultVersion: "P20-164"
+                retriever:
+                  modernSCM:
+                    scm:
+                      github:
+                        repoOwner: "Over-haul"
+                        repository: "jenkins-library"
+                        credentialsId: "github-api-username"
+      02-sonarqube: |
+        credentials:
+          system:
+            domainCredentials:
+            - credentials:
+              - string:
+                  description: "SonarQube Token"
+                  id: "sonarqube-token"
+                  scope: GLOBAL
+                  secret: ${SONARQUBE_TOKEN}
+        unclassified:
+          sonarglobalconfiguration:
+            buildWrapperEnabled: true
+            installations:
+              - name: "sonarqube"
+                serverUrl: ${SONARQUBE_URL}
+                credentialsId: sonarqube-token
+      03-slack: |
+        credentials:
+          system:
+            domainCredentials:
+            - credentials:
+              - string:
+                  description: "Slack Webhook URL"
+                  id: "slack-url"
+                  scope: GLOBAL
+                  secret: ${SLACK_URL}
+              - string:
+                  description: "Slack Token"
+                  id: "slack-token"
+                  scope: GLOBAL
+                  secret: ${SLACK_TOKEN}
+        unclassified:
+          slackNotifier:
+            teamDomain: over-haul
+            tokenCredentialId: slack-token
+      04-azuread: |
+        jenkins:
+            azure:
+              clientId: "${azure-ad-client-id}"
+              clientSecret: "${azure-ad-client-secret}"
+              tenant: "${azure-ad-tenant-id}"
+          authorizationStrategy:
+            azureAdMatrix:
+              permissions:
+                - "Overall/Read:anonymous"
+                - "Overall/Administer:anonymous"

@@ -41,9 +41,6 @@ plugins:
   - artifactId: ec2
     source:
       version: latest
-  - artifactId: email-ext
-    source:
-      version: latest
   - artifactId: git
     source:
       version: latest

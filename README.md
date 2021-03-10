@@ -20,6 +20,34 @@ The Configuration as Code ([CasC](https://github.com/jenkinsci/configuration-as-
 
 Groovy scripts can be added to `/usr/share/jenkins/ref/init.groovy.d/` to be run when Jenkins starts up. This is a good way to provide repeatable configuration if you need something outside of additional plugins or features coverered by the CasC plugin. Please note that scripts in this directory are run in alphabetical order so if you are relying on scripts from more than one layer of Docker images be sure to name your files appropraitely.
 
+### `jenkins/jenkins:lts` container environment variables
+
+|               Environment Variable | Default Value                                                                        | Description |
+|                                --- | ---                                                                                  |         --- |
+|                             `PATH` | `/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin` |           - |
+|                             `LANG` | `en_US.UTF-8`                                                                        |           - |
+|                         `LANGUAGE` | `en_US:en`                                                                           |           - |
+|                           `LC_ALL` | `en_US.UTF-8`                                                                        |           - |
+|                     `JAVA_VERSION` | `jdk8u282-b08`                                                                       |           - |
+|                        `JAVA_HOME` | `/opt/java/openjdk`                                                                  |           - |
+|                     `JENKINS_HOME` | `/var/jenkins_home`                                                                  |           - |
+|         `JENKINS_SLAVE_AGENT_PORT` | `50000`                                                                              |           - |
+|                              `REF` | `/usr/share/jenkins/ref`                                                             |           - |
+|                  `JENKINS_VERSION` | `2.263.4`                                                                            |           - |
+|                       `JENKINS_UC` | `https://updates.jenkins.io`                                                         |           - |
+|          `JENKINS_UC_EXPERIMENTAL` | `https://updates.jenkins.io/experimental`                                            |           - |
+| `JENKINS_INCREMENTALS_REPO_MIRROR` | `https://repo.jenkins-ci.org/incrementals`                                           |           - |
+|          `COPY_REFERENCE_FILE_LOG` | `/var/jenkins_home/copy_reference_file.log`                                          |           - |
+
+### `JCasC` environment variables
+
+| Environment Variable | Default Value | Description |
+|                  --- | ---           |         --- |
+| `JENKINS_PUBLIC_URL` | -             |           - |
+|          `SLACK_URL` | -             |           - |
+|   `GITHUB_API_TOKEN` | -             |           - |
+
+
 #### Add groovy scripts
 
 ```Dockerfile
